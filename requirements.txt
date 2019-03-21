@@ -1,0 +1,5 @@
+numpy
+
+rope
+flake8
+black
