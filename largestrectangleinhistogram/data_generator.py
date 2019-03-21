@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 # number of samples
-SAMPLES = 10_000
+SAMPLES = 1_000_000
 # max width and height of one histogram. X buckets each X height
 MAX_HIST_SIZE = 100
 
@@ -33,9 +33,8 @@ def histograms(samples=SAMPLES):
 
 
 def save_data(data, file):
-    root = Path(r".\data")
-    with open(Path(root, file), "w") as f:
-        f.write("\n".join(map(str, data)))
+    path = Path(r".\data", file)
+    np.save(path, data)
 
 
 def generate_data():
@@ -57,8 +56,8 @@ def main():
     print(f"Created {len(hists):,d} samples. Calc took {time() - t0:.2f} secs")
 
     t0 = time()
-    save_data(hists, "histograms.txt")
-    save_data(areas, "histograms_areas.txt")
+    save_data(hists, "histograms")
+    save_data(areas, "histograms_areas")
     print(f"Saving data to disk took {time() - t0:.2f} secs")
 
 
