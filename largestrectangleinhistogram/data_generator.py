@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 # number of samples
-SAMPLES = 1_000_000
+SAMPLES = 10_000
 # max width and height of one histogram. X buckets each X height
 MAX_HIST_SIZE = 100
 
@@ -32,28 +32,36 @@ def histograms(samples=SAMPLES):
         yield sample(range(MAX_HIST_SIZE), randrange(MAX_HIST_SIZE))
 
 
-if __name__ == "__main__":
-    t0 = time()
-    # V2 using np array
-    # hists = np.array([hist for hist in histograms(10)])
-    # print(f"Created {hists.shape} samples. Calc took {time() - t0:.2f} secs")
+def save_data(data, file):
+    root = Path(r".\data")
+    with open(Path(root, file), "w") as f:
+        f.write("\n".join(map(str, data)))
 
+
+def generate_data():
     hists = []
-    areas = []
+    areas = np.array([], int)
+    t0 = time()
     for i, hist in enumerate(histograms(), start=1):
         if i % 1_000 == 0:
             t = time() - t0
             print(f"{i:>6,d} {t:>8.2f} Perf: {t / i * 1000:>6.2f} secs/1000 areas")
-        hists.append(hist)
-        areas.append(largest_rectangle_area(hist))
+        hists.append(np.array(hist))
+        areas = np.append(areas, largest_rectangle_area(hist))
+    return hists, areas
 
+
+def main():
+    t0 = time()
+    hists, areas = generate_data()
     print(f"Created {len(hists):,d} samples. Calc took {time() - t0:.2f} secs")
 
-    root = Path(r".\data")
-    with open(Path(root, "histograms.txt"), "w") as f:
-        f.write("\n".join(map(str, hists)))
+    t0 = time()
+    save_data(hists, "histograms.txt")
+    save_data(areas, "histograms_areas.txt")
+    print(f"Saving data to disk took {time() - t0:.2f} secs")
 
-    with open(Path(root, "histograms_areas.txt"), "w") as f:
-        f.write("\n".join(map(str, areas)))
 
+if __name__ == "__main__":
+    main()
     print("DONE!!!")
